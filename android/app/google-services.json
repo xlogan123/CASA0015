@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "366827763255",
+    "project_id": "flutter-ai-playground-fe7b7",
+    "storage_bucket": "flutter-ai-playground-fe7b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366827763255:android:5d9d4c954f9d3f9642b1b2",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQIUFSRVqYsOXEC8fHkclag27KYnSFKGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366827763255:android:0c802b37e2e8679842b1b2",
+        "android_client_info": {
+          "package_name": "com.example.weather_walk_player"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQIUFSRVqYsOXEC8fHkclag27KYnSFKGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
