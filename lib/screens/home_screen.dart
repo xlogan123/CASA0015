@@ -137,24 +137,24 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getAudioPath() {
     // 增加大括号消除警告
     if (currentWeather == "Sunny" && currentPace == "Slow") {
-      return "audio/sunny_slow.wav";
+      return "audio/sunny_slow.mp3";
     }
     if (currentWeather == "Sunny" && currentPace == "Fast") {
-      return "audio/sunny_fast.wav";
+      return "audio/sunny_fast.mp3";
     }
     if (currentWeather == "Rainy" && currentPace == "Slow") {
-      return "audio/rainy_slow.wav";
+      return "audio/rainy_slow.mp3";
     }
     if (currentWeather == "Rainy" && currentPace == "Fast") {
-      return "audio/rainy_fast.wav";
+      return "audio/rainy_fast.mp3";
     }
     if (currentWeather == "Cloudy" && currentPace == "Slow") {
-      return "audio/cloudy_slow.wav";
+      return "audio/cloudy_slow.mp3";
     }
     if (currentWeather == "Cloudy" && currentPace == "Fast") {
-      return "audio/cloudy_fast.wav";
+      return "audio/cloudy_fast.mp3";
     }
-    return "audio/sunny_slow.wav";
+    return "audio/sunny_slow.mp3";
   }
 
   void _toggleAudio() async {
