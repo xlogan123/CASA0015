@@ -3,7 +3,7 @@
 > **CASA0015: Mobile Systems & Interactions (2021/2022)**  
 > A Flutter-based mobile application exploring context-aware soundscapes within the Connected Environment.
 
-**🔗 [View HTML Landing Page Here](你的GitHubPages链接填这里)**  
+**🔗 [View HTML Landing Page Here](https://xlogan123.github.io/CASA0015/)**  
 **🎬 [Watch the 3-min Presentation Video Here]()**
 
 ---
@@ -14,12 +14,9 @@ In modern urban life, commuting is often viewed as a mundane task. We walk from 
 **WalkBeat** aims to solve this by transforming walking into a mindful, interactive experience. By utilizing the concept of a **Connected Environment**, the app bridges the physical world (user's pace and local weather) with the digital world (dynamic UI and soundscapes), encouraging users to put their phones in their pockets and actually *feel* their environment.
 
 ## 📱 2. Screenshots
-*(Replace the placeholders below with your actual screenshots)*
-
-| Home Screen (Sunny & Slow) | Home Screen (Rainy & Fast) |   Walk Diary (History)    |   Settings & Calibration   |
-| :------------------------: | :------------------------: | :-----------------------: | :------------------------: |
-|  ![Home 1](截图路径1.png)  |  ![Home 2](截图路径2.png)  | ![History](截图路径3.png) | ![Settings](截图路径4.png) |
-
+|     Home Screen (Cloudy)      |        Walk Diary (History)         |        Settings & Calibration         |
+| :---------------------------------: | :---------------------------------: | :-----------------------------------: |
+| ![Home](docs/images/Cloudy.jpg) | ![History](docs/images/dairy.jpg) | ![Settings](docs/images/setting.jpg) |
 ---
 
 ## 🧠 3. Overview of the Mobile App (Technical & UX)
@@ -51,3 +48,14 @@ To fulfill the requirement of logging data over time, WalkBeat seamlessly integr
 1. Clone this repository:
    ```bash
    git clone https://github.com/YourUsername/WalkBeat.git
+2. Environment Setup:
+    Ensure you have the Flutter SDK installed and configured.
+    Verify your connection to Firebase (check google-services.json or firebase_options.dart).
+3. Install Dependencies:
+   ```bash
+    flutter pub get
+4. Run the Application:
+    For the best experience with sensor data (accelerometer), a physical device is highly recommended.
+    Execute the following command:
+    ```bash
+    flutter run
