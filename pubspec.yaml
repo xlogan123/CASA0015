@@ -31,23 +31,17 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # 传感器
   sensors_plus: ^7.0.0
 
-  # 定位
   geolocator: ^14.0.2
 
-  # 天气API
   http: ^1.6.0
 
-  # 音频
   audioplayers: ^6.6.0
 
-  # Firebase
   firebase_core: ^4.7.0
   cloud_firestore: ^6.3.0
 
-  # 路由
   go_router: ^14.2.0
   shared_preferences: ^2.5.5
 

@@ -157,19 +157,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _stopSensor() => _sensorSubscription?.cancel();
 
-  String _getAudioPath() {
-    if (currentWeather == "Sunny" && currentPace == "Slow")
-      return "audio/sunny_slow.mp3";
-    if (currentWeather == "Sunny" && currentPace == "Fast")
-      return "audio/sunny_fast.mp3";
-    if (currentWeather == "Rainy" && currentPace == "Slow")
-      return "audio/rainy_slow.mp3";
-    if (currentWeather == "Rainy" && currentPace == "Fast")
-      return "audio/rainy_fast.mp3";
-    if (currentWeather == "Cloudy" && currentPace == "Slow")
-      return "audio/cloudy_slow.mp3";
-    if (currentWeather == "Cloudy" && currentPace == "Fast")
-      return "audio/cloudy_fast.mp3";
+String _getAudioPath() {
+    if (currentWeather == "Sunny") {
+      return currentPace == "Slow"
+          ? "audio/sunny_slow.mp3"
+          : "audio/sunny_fast.mp3";
+    }
+
+    if (currentWeather == "Rainy") {
+      return currentPace == "Slow"
+          ? "audio/rain_slow.mp3"
+          : "audio/rain_fast.mp3";
+    }
+
+    if (currentWeather == "Cloudy") {
+      return currentPace == "Slow"
+          ? "audio/cloudy_slow.mp3"
+          : "audio/cloudy_fast.mp3";
+    }
     return "audio/sunny_slow.mp3";
   }
 
