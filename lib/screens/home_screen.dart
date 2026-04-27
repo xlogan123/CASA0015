@@ -2,11 +2,16 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; // 引入 debugPrint 消除警告
+import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // 引入本地存储
+
+import 'history_screen.dart';
+import 'settings_screen.dart'; // 引入设置页
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,28 +21,43 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // --- 状态变量扩展 ---
   String currentWeather = "Sunny";
   String currentPace = "Slow";
   bool isLoadingWeather = false;
 
-  String cityName = "定位中...";
+  String cityName = "Locating...";
   String temperature = "--";
-  String weatherDetail = "等待获取...";
+  String weatherDetail = "Fetching data...";
 
-  // 填入你的 API Key
+  // ⚠️ 填入你的 API Key
   final String apiKey = "a833233089968a714179313e8e711790";
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isPlaying = false;
   StreamSubscription<UserAccelerometerEvent>? _sensorSubscription;
   DateTime _lastShakeTime = DateTime.now();
+  DateTime? _sessionStartTime;
+
+  // 用户设置变量
+  double _userVolume = 1.0;
+  double _userPaceThreshold = 3.0;
 
   @override
   void initState() {
     super.initState();
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    _loadSettings(); // 加载用户设置
     _fetchRealWeather();
+  }
+
+  // 加载本地设置
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userVolume = prefs.getDouble('volume') ?? 1.0;
+      _userPaceThreshold = prefs.getDouble('paceThreshold') ?? 3.0;
+    });
+    _audioPlayer.setVolume(_userVolume); // 应用音量
   }
 
   @override
@@ -47,20 +67,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // ============== API 获取逻辑 (恢复稳定版网络逻辑，仅修复警告) ==============
   Future<void> _fetchRealWeather() async {
-    setState(() => isLoadingWeather = true);
+    setState(() {
+      isLoadingWeather = true;
+      cityName = "Locating...";
+    });
 
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw Exception("权限被拒");
+          throw Exception("Permission denied");
         }
       }
 
-      // 恢复你原始的获取逻辑，仅仅把废弃的 desiredAccuracy 换成了官方推荐的新写法（功能完全一样）
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.low,
@@ -69,11 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
       String url =
           "https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric";
-
       var response = await http.get(Uri.parse(url));
+
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
-
         String mainWeather = jsonResponse['weather'][0]['main'];
         String description = jsonResponse['weather'][0]['description'];
         String fetchedCity = jsonResponse['name'];
@@ -82,7 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           cityName = fetchedCity;
           temperature = "${fetchedTemp.toStringAsFixed(1)}°C";
-          weatherDetail = description;
+          // 将天气描述首字母大写
+          weatherDetail =
+              description[0].toUpperCase() + description.substring(1);
 
           if (mainWeather.contains("Clear")) {
             currentWeather = "Sunny";
@@ -103,27 +125,33 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => isLoadingWeather = false);
       }
     } catch (e) {
-      // 使用 debugPrint 替代 print 消除警告
       debugPrint("Error: $e");
-      setState(() => isLoadingWeather = false);
+      setState(() {
+        isLoadingWeather = false;
+        cityName = "Location Failed";
+        temperature = "N/A";
+        weatherDetail = "Check network or GPS";
+      });
     }
   }
 
-  // ============== 传感器与播放逻辑 ==============
   void _startSensor() {
+    // 每次启动传感器时，重新加载一次阈值，确保设置生效
+    _loadSettings();
+
     _sensorSubscription = userAccelerometerEventStream().listen((event) {
       double magnitude = sqrt(
         event.x * event.x + event.y * event.y + event.z * event.z,
       );
-      if (magnitude > 3.0) {
+
+      // 使用用户在 Settings 里设置的灵敏度！
+      if (magnitude > _userPaceThreshold) {
         _lastShakeTime = DateTime.now();
-        // 增加大括号消除警告
         if (currentPace != "Fast") {
           _changePace("Fast");
         }
       } else {
         if (DateTime.now().difference(_lastShakeTime).inSeconds > 3) {
-          // 增加大括号消除警告
           if (currentPace != "Slow") {
             _changePace("Slow");
           }
@@ -135,41 +163,71 @@ class _HomeScreenState extends State<HomeScreen> {
   void _stopSensor() => _sensorSubscription?.cancel();
 
   String _getAudioPath() {
-    // 增加大括号消除警告
-    if (currentWeather == "Sunny" && currentPace == "Slow") {
-      return "audio/sunny_slow.mp3";
-    }
-    if (currentWeather == "Sunny" && currentPace == "Fast") {
-      return "audio/sunny_fast.mp3";
-    }
-    if (currentWeather == "Rainy" && currentPace == "Slow") {
-      return "audio/rainy_slow.mp3";
-    }
-    if (currentWeather == "Rainy" && currentPace == "Fast") {
-      return "audio/rainy_fast.mp3";
-    }
-    if (currentWeather == "Cloudy" && currentPace == "Slow") {
-      return "audio/cloudy_slow.mp3";
-    }
-    if (currentWeather == "Cloudy" && currentPace == "Fast") {
-      return "audio/cloudy_fast.mp3";
-    }
-    return "audio/sunny_slow.mp3";
+    if (currentWeather == "Sunny" && currentPace == "Slow")
+      return "audio/sunny_slow.wav";
+    if (currentWeather == "Sunny" && currentPace == "Fast")
+      return "audio/sunny_fast.wav";
+    if (currentWeather == "Rainy" && currentPace == "Slow")
+      return "audio/rainy_slow.wav";
+    if (currentWeather == "Rainy" && currentPace == "Fast")
+      return "audio/rainy_fast.wav";
+    if (currentWeather == "Cloudy" && currentPace == "Slow")
+      return "audio/cloudy_slow.wav";
+    if (currentWeather == "Cloudy" && currentPace == "Fast")
+      return "audio/cloudy_fast.wav";
+    return "audio/sunny_slow.wav";
   }
 
   void _toggleAudio() async {
     if (_isPlaying) {
       await _audioPlayer.pause();
       _stopSensor();
+
+      if (_sessionStartTime != null) {
+        Duration duration = DateTime.now().difference(_sessionStartTime!);
+
+        Map<String, dynamic> walkData = {
+          "city": cityName,
+          "weather": currentWeather,
+          "weather_detail": weatherDetail,
+          "temperature": temperature,
+          "duration_seconds": duration.inSeconds,
+          "date": DateTime.now().toIso8601String(),
+        };
+
+        try {
+          await FirebaseFirestore.instance
+              .collection('walk_sessions')
+              .add(walkData);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("🎉 Session ended! Data synced to cloud."),
+                backgroundColor: Colors.teal,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        } catch (e) {
+          debugPrint("Upload failed: $e");
+        }
+      }
+
       setState(() {
         _isPlaying = false;
         currentPace = "Slow";
+        _sessionStartTime = null;
       });
     } else {
+      await _loadSettings(); // 播放前加载最新音量
       String path = _getAudioPath();
       await _audioPlayer.play(AssetSource(path));
       _startSensor();
-      setState(() => _isPlaying = true);
+
+      setState(() {
+        _isPlaying = true;
+        _sessionStartTime = DateTime.now();
+      });
     }
   }
 
@@ -180,7 +238,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ============== UI 界面设计 ==============
   @override
   Widget build(BuildContext context) {
     Color weatherColor;
@@ -213,6 +270,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   )
                 : const Icon(Icons.refresh),
             onPressed: isLoadingWeather ? null : _fetchRealWeather,
+            tooltip: "Refresh Weather",
+          ),
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: "Walk Diary",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
+              );
+            },
+          ),
+          // ====== 新增：设置按钮 ======
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: "Settings",
+            onPressed: () async {
+              // 跳转设置页，返回时重新加载设置
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+              _loadSettings();
+            },
           ),
         ],
       ),
@@ -224,7 +305,6 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 40),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                // 替换废弃的 withOpacity 为 withValues(alpha: x)
                 color: weatherColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
@@ -342,8 +422,8 @@ class _HomeScreenState extends State<HomeScreen> {
               duration: const Duration(milliseconds: 500),
               child: Text(
                 currentPace == "Fast"
-                    ? "🔥 步频较快，已为您切换节奏音乐"
-                    : "🍃 正在漫步，为您播放舒缓环境音",
+                    ? "🔥 Fast pace. Upbeat track playing."
+                    : "🍃 Slow pace. Calming ambiance playing.",
                 style: const TextStyle(fontSize: 16, color: Colors.white70),
               ),
             ),
@@ -372,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    _isPlaying ? "结束行程" : "戴上耳机，开始探索",
+                    _isPlaying ? "End Walk" : "Put on headphones & Start",
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,
