@@ -49,13 +49,14 @@ To fulfill the requirement of logging data over time, WalkBeat seamlessly integr
    ```bash
    git clone https://github.com/YourUsername/WalkBeat.git
 2. Environment Setup:
-    Ensure you have the Flutter SDK installed and configured.
-    Verify your connection to Firebase (check google-services.json or firebase_options.dart).
+    - Ensure you have the Flutter SDK installed and configured.
+    - Verify your connection to Firebase (check `google-services.json` or `firebase_options.dart`).
+
 3. Install Dependencies:
    ```bash
     flutter pub get
 4. Run the Application:
-    For the best experience with sensor data (accelerometer), a physical device is highly recommended.
-    Execute the following command:
+    - For the best experience with sensor data (accelerometer), a physical device is highly recommended.
+    - Execute the following command:
     ```bash
     flutter run
