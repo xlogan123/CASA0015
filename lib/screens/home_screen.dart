@@ -2,16 +2,15 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 引入本地存储
+import 'package:shared_preferences/shared_preferences.dart'; 
 
 import 'history_screen.dart';
-import 'settings_screen.dart'; // 引入设置页
+import 'settings_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String temperature = "--";
   String weatherDetail = "Fetching data...";
 
-  // ⚠️ 填入你的 API Key
   final String apiKey = "a833233089968a714179313e8e711790";
 
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -38,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime _lastShakeTime = DateTime.now();
   DateTime? _sessionStartTime;
 
-  // 用户设置变量
   double _userVolume = 1.0;
   double _userPaceThreshold = 3.0;
 
@@ -46,18 +43,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    _loadSettings(); // 加载用户设置
+    _loadSettings(); 
     _fetchRealWeather();
   }
 
-  // 加载本地设置
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _userVolume = prefs.getDouble('volume') ?? 1.0;
       _userPaceThreshold = prefs.getDouble('paceThreshold') ?? 3.0;
     });
-    _audioPlayer.setVolume(_userVolume); // 应用音量
+    _audioPlayer.setVolume(_userVolume); 
   }
 
   @override
@@ -102,7 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           cityName = fetchedCity;
           temperature = "${fetchedTemp.toStringAsFixed(1)}°C";
-          // 将天气描述首字母大写
           weatherDetail =
               description[0].toUpperCase() + description.substring(1);
 
@@ -136,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startSensor() {
-    // 每次启动传感器时，重新加载一次阈值，确保设置生效
+    
     _loadSettings();
 
     _sensorSubscription = userAccelerometerEventStream().listen((event) {
@@ -144,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
         event.x * event.x + event.y * event.y + event.z * event.z,
       );
 
-      // 使用用户在 Settings 里设置的灵敏度！
+     
       if (magnitude > _userPaceThreshold) {
         _lastShakeTime = DateTime.now();
         if (currentPace != "Fast") {
@@ -164,18 +159,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _getAudioPath() {
     if (currentWeather == "Sunny" && currentPace == "Slow")
-      return "audio/sunny_slow.wav";
+      return "audio/sunny_slow.mp3";
     if (currentWeather == "Sunny" && currentPace == "Fast")
-      return "audio/sunny_fast.wav";
+      return "audio/sunny_fast.mp3";
     if (currentWeather == "Rainy" && currentPace == "Slow")
-      return "audio/rainy_slow.wav";
+      return "audio/rainy_slow.mp3";
     if (currentWeather == "Rainy" && currentPace == "Fast")
-      return "audio/rainy_fast.wav";
+      return "audio/rainy_fast.mp3";
     if (currentWeather == "Cloudy" && currentPace == "Slow")
-      return "audio/cloudy_slow.wav";
+      return "audio/cloudy_slow.mp3";
     if (currentWeather == "Cloudy" && currentPace == "Fast")
-      return "audio/cloudy_fast.wav";
-    return "audio/sunny_slow.wav";
+      return "audio/cloudy_fast.mp3";
+    return "audio/sunny_slow.mp3";
   }
 
   void _toggleAudio() async {
@@ -219,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _sessionStartTime = null;
       });
     } else {
-      await _loadSettings(); // 播放前加载最新音量
+      await _loadSettings(); 
       String path = _getAudioPath();
       await _audioPlayer.play(AssetSource(path));
       _startSensor();
@@ -282,12 +277,10 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // ====== 新增：设置按钮 ======
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: "Settings",
             onPressed: () async {
-              // 跳转设置页，返回时重新加载设置
               await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SettingsScreen()),
