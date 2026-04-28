@@ -3,7 +3,7 @@
 > **CASA0015: Mobile Systems & Interactions (2021/2022)**  
 > A Flutter-based mobile application exploring context-aware soundscapes within the Connected Environment.
 
-**🔗 [View HTML Landing Page Here](https://xlogan123.github.io/CASA0015/)**  
+**🔗 [View HTML Page Here](https://xlogan123.github.io/CASA0015/)**  
 **🎬 [Watch the 3-min Presentation Video Here]()**
 
 ---
