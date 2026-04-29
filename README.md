@@ -4,7 +4,11 @@
 > A Flutter-based mobile application exploring context-aware soundscapes within the Connected Environment.
 
 **🔗 [View HTML Page Here](https://xlogan123.github.io/CASA0015/)**  
-**🎬 [Watch the 3-min Presentation Video Here]()**
+# 🎬 [Watch the 3-min Presentation Video Here](https://github.com/xlogan123/CASA0015/raw/main/docs/video.mp4)
+
+<video src="https://github.com/xlogan123/CASA0015/raw/main/docs/video.mp4" width="100%" controls>
+  Your browser does not support the video tag.
+</video>
 
 ---
 
