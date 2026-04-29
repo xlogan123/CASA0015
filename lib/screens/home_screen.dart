@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String weatherDetail = "Fetching data...";
 
   final String apiKey = "a833233089968a714179313e8e711790";
-
+//volume and pace threshold
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isPlaying = false;
   StreamSubscription<UserAccelerometerEvent>? _sensorSubscription;
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
       isLoadingWeather = true;
       cityName = "Locating...";
     });
-
+//weather
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
-
+//sensor
   void _startSensor() {
     
     _loadSettings();
@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _stopSensor() => _sensorSubscription?.cancel();
-
+//audio
 String _getAudioPath() {
     if (currentWeather == "Sunny") {
       return currentPace == "Slow"
@@ -177,7 +177,7 @@ String _getAudioPath() {
     }
     return "audio/sunny_slow.mp3";
   }
-
+//toggle
   void _toggleAudio() async {
     if (_isPlaying) {
       await _audioPlayer.pause();
@@ -230,14 +230,14 @@ String _getAudioPath() {
       });
     }
   }
-
+//change pace
   void _changePace(String newPace) async {
     setState(() => currentPace = newPace);
     if (_isPlaying) {
       await _audioPlayer.play(AssetSource(_getAudioPath()));
     }
   }
-
+//UI
   @override
   Widget build(BuildContext context) {
     Color weatherColor;

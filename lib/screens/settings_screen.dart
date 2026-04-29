@@ -25,15 +25,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _paceThreshold = prefs.getDouble('paceThreshold') ?? 3.0;
     });
   }
-
-  // 保存音量设置
+//voice
   Future<void> _saveVolume(double value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('volume', value);
     setState(() => _volume = value);
   }
-
-  // 保存灵敏度设置
+//sensor
   Future<void> _saveThreshold(double value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('paceThreshold', value);
@@ -63,7 +61,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 音量控制
             const Text(
               "Music Volume",
               style: TextStyle(fontSize: 16, color: Colors.white70),
@@ -101,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 传感器灵敏度控制
+            // sensor threshold slider
             Text(
               "Pace Threshold: ${_paceThreshold.toStringAsFixed(1)}",
               style: const TextStyle(fontSize: 16, color: Colors.white70),
